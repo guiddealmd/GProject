@@ -1,97 +1,64 @@
 const express = require('express')
-const app = express()
+// Passa uma informação do express para constante express
+
+const userService = require('./services/users')
+
+
+const app = express();
+
+// O express passa se tornar uma função e direciona para uma constante
 const port = 3000
-app.use(express.json());
 
+//  Utiliza para obter recursos, permitindo o uso de Json
 
-let bd = [
-  {
-    id: "1",
-    name: "Guilherme"
-  },
-  {
-    id: "2",
-    name: "Bruna"
-  }
-]
+// Simulação de um banco de dados
 //get users
 app.get('/users', (request, response) => {
-  response.json(bd);
+  response.json(userService.getUsers()); // Retorna os usuarios do bd
 })
 
-app.get('/users/:id', (request, response) => {
+app.get('/users/:id', (request, response) => { // Adiciona informações
 
   // pegar o ID da requisição
   const idUser = request.params.id;
 
-  // encontrar o usuario correspondente no bd
-  const user = bd.filter((usuario) => usuario.id === idUser);
+  // // encontrar o usuario correspondente no bd
+  // const user = bd.filter((usuario) => usuario.id === idUser);
+  response.json(userService.getUsersById(idUser));
 
   // responder a requisição com as info do user
   response.json(user);
 
 })
 
-app.post("/users", (request, response) => {
-
-  // pegar o corpo da requisição
+app.post("/users", (request, response) => { 
   const body = request.body;
-
-  // criar um novo objeto a partir desse corpo
-  const newUser = {
-
-    id: (bd.length + 1).toString(),
-    name: body.name
-  }
-
-  // adicionar esse novo objeto no banco
-  bd.push(newUser);
-
-  // responder a requisição com o banco completo
-  response.json(bd);
+  response.json(userService.creatUser(body));
 
 })
 
-app.delete("/users/:id", (request, response) => {
+  app.delete("/users/:id", (request, response) => {
+     const idUser = request.params.id;
+  userRepository.deleteUser(idUser);
+  response.json("Apagado com sucesso");
 
-  // pegar o id da requisição
-  const idUser = request.params.id;
-
-  // percorrer o banco e encontrar quem tem o id da requisição
-  bd = bd.filter((usuario) => usuario.id != idUser);
-
-  // deletar o usuario
+  // status(201) usa quando voce ciou algo 
 
 
   // responder com o meu banco atualizado
   response.json(bd);
 })
 
-app.patch("/users/:id", (request, response) => {
-
-  // pegar o id da requisição
-  const idUser = request.params.id;
-
-  // pegar o corpo da requisição
-  const body = request.body;
-
-  // percorrer o banco 
-  bd = bd.map((usuario) => {
-
-    if (usuario.id === idUser) {
-      // atualizar as informações
-      usuario.name = body.name;
-    }
-    return usuario
-
-  })
-
-  // atualizar as informações
-
-  // exibir a requisição com o banco
-  response.json(bd)
-
+  app.patch("/users/:id", (request, response) => {
+const idUser = request.params.id;
+const body = request.body;
+userRepository.updateUser(idUser, body);
+response.status(200).json();
 })
+
+// atualizar as informações
+
+// exibir a requisição com o banco
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
